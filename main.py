@@ -24,4 +24,5 @@ def root():
 def predict(data: Features):
     features_array = np.array([data.features])
     prediction = model.predict(features_array)
+    print(prediction)
     return {"prediction": prediction.tolist()}
