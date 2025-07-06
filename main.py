@@ -7,6 +7,8 @@ from passlib.context import CryptContext
 import xgboost as xgb
 import numpy as np
 
+from app.config import DATABASE_URL, SECRET_KEY
+
 app = FastAPI()
 
 model = xgb.XGBRegressor()
@@ -14,14 +16,12 @@ model.load_model("model.json")
 
 security = HTTPBearer()
 
-DATABASE_URL = "postgresql://postgres:XXX@database-1.chg68yuwiy4m.eu-west-1.rds.amazonaws.com:5432/postgres"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 
 Base = declarative_base()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_TOKEN = "mysecrettoken"
 
 
 class UserLog(Base):
@@ -57,7 +57,7 @@ class UserLogin(BaseModel):
 
 
 def get_current_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    if credentials.credentials != SECRET_TOKEN:
+    if credentials.credentials != SECRET_KEY:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
         )
@@ -74,7 +74,7 @@ def login(user: UserLogin):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
         )
-    return {"access_token": SECRET_TOKEN}
+    return {"access_token": SECRET_KEY}
 
 
 @app.post("/predict")
