@@ -6,6 +6,7 @@ from app.schemas.user import UserLogin, TokenResponse
 from app.models.user import User
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
 
+
 class AuthService:
     def __init__(self, db: Session):
         self.db = db
@@ -17,7 +18,9 @@ class AuthService:
 
         user.update_last_login()
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        token = create_access_token(data={"sub": user.email, "role": user.role}, expires_delta=access_token_expires)
+        token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
+        )
         user.token = token
         user.token_expiration = datetime.utcnow() + access_token_expires
 

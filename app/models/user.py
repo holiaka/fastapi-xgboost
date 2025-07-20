@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = "users"
 
@@ -12,7 +13,8 @@ class User(Base):
     surname = Column(String, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
-    role = Column(String, default="user")
+    country = Column(String, default="")
+    comment = Column(String, default="")
     token = Column(String, nullable=True)
     token_expiration = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
