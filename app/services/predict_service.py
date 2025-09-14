@@ -8,18 +8,28 @@ from app.schemas.predict import PredictInput
 class PredictService:
     def __init__(self):
         self.model_info = {
-            "biomass": {
-                "file": "biomass.json",
-                "unit": "t/ha",
-                "label": "Above-ground biomass",
+            "growing-stock": {
+                "file": "01_GS.json",
+                "unit": "m³/ha",
+                "label": "Growing stock",
             },
-            "stock": {"file": "stock.json", "unit": "m³/ha", "label": "Growing stock"},
-            "height": {"file": "height.json", "unit": "m", "label": "Mean tree height"},
+            "trunk": {
+                "file": "02_M_all_stem.json",
+                "unit": "t/ha",
+                "label": "Total trunk biomass",
+            },
+            "trunk-bark": {
+                "file": "03_M_stem_bark.json",
+                "unit": "t/ha",
+                "label": "Trunk bark biomass",
+            },
         }
         self.models = self.load_models()
 
     def load_models(self) -> Dict[str, xgb.XGBRegressor]:
-        model_dir = "models/xgboost-models"  # відносний або абсолютний шлях
+        model_dir = (
+            "models/xgboost-models/tree-biomass"  # відносний або абсолютний шлях
+        )
 
         models = {}
         for key, info in self.model_info.items():
@@ -30,7 +40,9 @@ class PredictService:
         return models
 
     def predict(self, data: PredictInput) -> Dict[str, Dict[str, str]]:
-        features = np.array([[int(data.sp), data.origin, data.h, data.dbh, data.ba]])
+        features = np.array(
+            [[int(data.sp), int(data.origin), data.h, data.dbh, data.ba]]
+        )
         results = {}
 
         for key, model in self.models.items():
